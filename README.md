@@ -1,34 +1,34 @@
-# Projet d'Intégration Projective
+# Projective Forward Euler (PFE) - Python Implementation
 
-Bienvenue dans ce dépôt consacré à la matière facultative "Initiation à la recherche mathématique" de la troisième année de licence en mathématiques, portant sur le sujet de l'intégration projective. Ce projet vise à explorer les méthodes d'analyse numérique des équations différentielles raides.
+> **Context:** Research Internship (Bs) at Laboratoire J.A.D.  
+> **Topic:** Numerical Analysis of Stiff Differential Equations & Multi-scale Simulation.
 
-## Objectif du Projet
+## The Problem : Stiff Equations
 
-L'objectif principal de ce projet est d'étudier et de mettre en œuvre différentes techniques d'intégration numérique pour résoudre des équations différentielles raides. Ce dépôt contient à la fois mon mémoire en cours d'écriture et des codes sources utilisés pour l'analyse numérique.
+This project addresses a classic problem in numerical analysis: **Stiffness**.
 
-## Contenu du Dépôt
+In many physical or biological systems (like chemical reactions), you have processes happening at very different speeds simultaneously.
+* **Fast dynamics:** Variables that change instantly (e.g., rapid chemical bonding).
+* **Slow dynamics:** Variables that evolve over a long period.
 
-### 1. Mémoire en Cours d'Écriture
+Standard solvers (like `ode45` or standard Euler) are forced to take incredibly small time steps to capture the "fast" stuff, even if we only care about the "slow" evolution. This makes simulations painfully slow.
 
-Le mémoire se concentre sur les aspects théoriques et pratiques des équations différentielles et d'analyse numérique, et de l'intégration projective, une méthode efficace dans le cadre des analyses numériques des équations différentielles raides. Le document explore les concepts, les théories sous-jacentes, ainsi que des études de cas illustrant l'application de cette méthode.
+## The Solution : Projective Integration
 
-### 2. Codes Sources
+This repository implements the **Projective Forward Euler (PFE)** method. The goal is to speed up the simulation by skipping the expensive computation of fast dynamics once they have decayed.
 
-Ce dépôt contient également plusieurs implémentations de techniques d'intégration numérique, notamment :
+**How the algorithm works:**
+1.  **Inner Integrator :** We take a few small steps ($k$ steps of size $\delta t$) using a standard explicit method to dampen the fast modes.
+2.  **Projection (Extrapolation) :** We use the last two points to estimate the derivative of the slow variables.
+3.  **Macro Step :** We project the solution far into the future (step $M \gg \delta t$) linearly.
 
-- **Méthode d'Euler Explicite** 
-- **Méthode d'Euler Implicite** 
-- **Méthode de Runge-Kutta**
-- **Système de Lorenz** 
-- **Tableau d'erreurs**
-- **Intégration projective**
-- **Graphiques**
+This effectively allows us to "jump" over time, maintaining stability without computing every single micro-second.
 
-## Utilisation
+## Implementation Details
 
-Pour exécuter les codes sources, assurez-vous d'avoir Python installé sur votre machine. Vous pouvez cloner ce dépôt et exécuter les scripts en utilisant les commandes suivantes :
+The code is written in pure Python using `NumPy` for vectorized operations, making the mathematical translation of the algorithm straightforward and readable.
 
-```bash
-git clone [URL du dépôt]
-cd [nom du dossier]
-python [nom du script].py
+## Results & Visualization
+
+I benchmarked the PFE method against a standard explicit Euler scheme.
+The implementation demonstrates that for a stiff parameter $\epsilon = 10^{-3}$, the Projective method remains stable with a time step significantly larger than the stability limit of the standard solver.
