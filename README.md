@@ -1,34 +1,68 @@
-# Projective Forward Euler (PFE) - Python Implementation
+# Projective Forward Euler
 
-> **Context:** Research Internship (Bs) at Laboratoire J.A.D.  
-> **Topic:** Numerical Analysis of Stiff Differential Equations & Multi-scale Simulation.
+> **Status :** Research Project (Archive)
+> **Institution :** Université Côte d'Azur - Laboratoire J.A. Dieudonné
+> **Context :** Initiation to Research Project (PIR) - Bachelor degree in Fundamental Mathematics
 
-## The Problem : Stiff Equations
+This repository contains the work produced during a research initiation project under the supervision of **Pr. Thomas REY**. The project focuses on two distinct numerical challenges:
+1.  The analysis and implementation of the **Projective Forward Euler (PFE)** method for stiff systems.
+2.  The development of a **2D Navier-Stokes solver** (Lid-Driven Cavity) using standard finite difference schemes.
 
-This project addresses a classic problem in numerical analysis: **Stiffness**.
+### The Projective Forward Euler (PFE) Method
+We studied numerical methods for **multi-scale problems** where standard explicit schemes are computationally expensive due to stiffness (spectral gap).
 
-In many physical or biological systems (like chemical reactions), you have processes happening at very different speeds simultaneously.
-* **Fast dynamics:** Variables that change instantly (e.g., rapid chemical bonding).
-* **Slow dynamics:** Variables that evolve over a long period.
+* **Algorithm :** Implementation of the PFE method, which combines a "micro" integrator (standard Euler) to damp fast modes and a "macro" projective step to accelerate integration along the slow manifold
+* **Analysis :**
+    * Derivation of **Zero-Stability** and **Absolute Stability** regions
+    * Consistency analysis and order of convergence verification
+* **Validation :** Tested on stiff linear ODE systems (Dahlquist test equation $y' = \lambda y$) and systems with complex eigenvalues
 
-Standard solvers (like `ode45` or standard Euler) are forced to take incredibly small time steps to capture the "fast" stuff, even if we only care about the "slow" evolution. This makes simulations painfully slow.
+### 2D Navier-Stokes Solver
+In parallel, we developed a fluid dynamics solver from scratch to simulate the **Lid-Driven Cavity Flow**.
 
-## The Solution : Projective Integration
+* **Physics :** Unsteady Incompressible Navier-Stokes Equations
+* **Methodology :**
+    * **Grid:** Staggered Grid (Marker-and-Cell / MAC)
+    * **Time Integration :** Chorin-Temam Projection Method (handling pressure-velocity coupling)
+    * **Spatial Discretization :** Finite Differences for viscous and convective terms
+* **Results :** Velocity profiles ($u, v$) obtained for Reynolds numbers $Re=100, 400, 1000$
 
-This repository implements the **Projective Forward Euler (PFE)** method. The goal is to speed up the simulation by skipping the expensive computation of fast dynamics once they have decayed.
+---
 
-**How the algorithm works:**
-1.  **Inner Integrator :** We take a few small steps ($k$ steps of size $\delta t$) using a standard explicit method to dampen the fast modes.
-2.  **Projection (Extrapolation) :** We use the last two points to estimate the derivative of the slow variables.
-3.  **Macro Step :** We project the solution far into the future (step $M \gg \delta t$) linearly.
+### Project Note
+*While the initial ambition was to apply PFE acceleration directly to the Navier-Stokes solver, time constraints prevented this final integration. However, the research objectives were fully met by :*
+1.  *Conducting a deep exploration of the **PFE method** on stiff systems*
+2.  *Successfully implementing a **Finite Difference solver** for a complex 2D fluid dynamics problem*
 
-This effectively allows us to "jump" over time, maintaining stability without computing every single micro-second.
+###  Tech Stack
+* **Language :** Python
+* **Scientific Stack :** `NumPy` (Arrays & Linear Algebra), `Matplotlib` (Visualization of stability regions and flow streamlines)
 
-## Implementation Details
+### Reference
+This project relies on the following academic resources, courses, and papers:
 
-The code is written in pure Python using `NumPy` for vectorized operations, making the mathematical translation of the algorithm straightforward and readable.
+**Primary Sources**
+* **[1] Thomas Rey**, *Cours sur les Équations Différentielles et EDP*. Université Nice Côte d’Azur - M1 IM.
+* **[2] Thomas Rey, R. Bailo, W. Melis, G. Samaey**, *Projective integration methods for multiscale collisional kinetic equations*. Université Nice Côte d’Azur.
+* **[6] C. W. Gear and Ioannis G. Kevrekidis**, *Projective Methods for Stiff Differential Equations: Problems with Gaps in Their Eigenvalue Spectrum*, 2002.
 
-## Results & Visualization
+**Numerical Analysis & ODEs**
+* **[3] Florent Berthelin**, *Équations Différentielles*. Cassini Ed, 2017.
+* **[4] Afeintou Sangam**, *Cours sur les Schémas Numériques des Équations Différentielles*. Université Nice Côte d’Azur - L3 Mathématiques.
+* **[5] Claire Scheid**, *Cours d’Analyse Numérique 2*. Université Nice Côte d’Azur - L3 Mathématiques.
+* **[9] E. Hairer, S. P. Nørsett, and G. Wanner**, *Solving Ordinary Differential Equations I: Nonstiff Problems (2nd ed.)*. Springer-Verlag, 2009.
+* **[11] Jean-Pierre Demailly**, *Analyse Numérique et Équations Différentielles (4ème éd.)*. EDP Sciences, 2016.
 
-I benchmarked the PFE method against a standard explicit Euler scheme.
-The implementation demonstrates that for a stiff parameter $\epsilon = 10^{-3}$, the Projective method remains stable with a time step significantly larger than the stability limit of the standard solver.
+**Fluid Dynamics & Navier-Stokes**
+* **[12] Barba, Lorena A., and Forsyth, Gilbert F.** (2018), *CFD Python: the 12 steps to Navier-Stokes equations*. Journal of Open Source Education. [GitHub](https://github.com/barbagroup/cfd).
+* **[14] Jacques-Louis Lions and Giovanni Prodi**, *Un théorème d’existence et unicité dans les équations de Navier-Stokes en dimension 2*. C. R. Acad. Sci., Paris, 1959.
+* **[15] Alain Ciffréo, Francois Peters**, *Cours sur la mécanique des milieux continus*. Université Nice Côte d’Azur - L3 Physique.
+
+**Advanced Research**
+* **[7] Ward Melis**, *Projective Integration for Hyperbolic Conservation Laws and Multiscale Kinetic Equations*. PhD Thesis, 2017, KU Leuven.
+* **[8] SIAM Journal on Scientific Computing**, *Projective Integration: A Fast and Efficient Numerical Method for Stiff Differential Equations*. 24(1): 16–40.
+* **[10] Multiscale Computational Methods for Stiff Problems**, in *Computational Methods in Applied Sciences*, Vol. 4, Springer-Verlag.
+* **[13] Thomas Giarrizzi, Yuran Wang**, *Non-uniqueness of Turbulent Solutions of the Navier-Stokes Equation in Dimension N = 3*. ENS PSL, 2024.
+
+
+  **Authors:** SINADINOVIC Marko & BENHARRATS Nadir.
